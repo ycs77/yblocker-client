@@ -1,8 +1,9 @@
 {
   "private": "true",
   "scripts": {
-    "start": "node yblocker.js",
-    "dev": "nodemon yblocker.js"
+    "dev": "tsx watch yblocker.ts",
+    "build": "tsup",
+    "start": "node dist/yblocker.js"
   },
   "dependencies": {
     "@cliqz/adblocker": "^1.26.6",
@@ -12,6 +13,10 @@
     "psl": "^1.9.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "terser": "^5.17.7",
+    "tsup": "^6.7.0",
+    "tsx": "^3.0.0",
+    "typescript": "^5.1.0"
   }
 }

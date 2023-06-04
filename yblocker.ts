@@ -1,11 +1,11 @@
-(async () => {
-  const fs = require('fs')
-  const path = require('path')
-  const mockttp = require('mockttp')
-  const { FiltersEngine, Request, parseFilters } = require('@cliqz/adblocker')
-  const extractDomain = require('extract-domain')
-  const c = require('picocolors')
+import fs from 'fs'
+import path from 'path'
+import * as mockttp from 'mockttp'
+import { FiltersEngine, Request, parseFilters } from '@cliqz/adblocker'
+import extractDomain from 'extract-domain'
+import c from 'picocolors'
 
+(async () => {
   const server = mockttp.getLocal({
     https: {
       keyPath: './certs/testCA.key',
@@ -34,7 +34,10 @@
     })
   }
 
-  let injection = {}
+  let injection: {
+    styles?: string
+    scripts?: string[]
+  } = {}
 
   server.forAnyRequest()
     .thenPassThrough({
@@ -53,8 +56,6 @@
             domain: extractDomain(new URL(req.url).hostname, { tld: true }),
           })
 
-          console.log('styles', styles)
-
           injection.styles = styles || undefined
           injection.scripts = scripts || undefined
 
@@ -64,9 +65,10 @@
       async beforeResponse(res) {
         if (res.headers['content-type']?.startsWith('text/html')) {
           let body = await res.body.getText()
-          if (injection.scripts)
+
+          if (body && injection.scripts)
             body = body.replace('</head>', `<script>${injection.scripts}</script></head>`)
-          if (injection.styles)
+          if (body && injection.styles)
             body = body.replace('</head>', `<style>${injection.styles}</style></head>`)
 
           return { body }
@@ -76,5 +78,5 @@
 
   await server.start(8080)
 
-  console.log(`Server running on port ${server.port}`)
+  console.log(c.green(`Server running on port ${server.port}`))
 })()
