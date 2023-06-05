@@ -1,19 +1,21 @@
 {
   "private": "true",
   "scripts": {
-    "dev": "tsx watch -r dotenv/config yblocker.ts",
+    "dev": "cross-env NODE_ENV=development tsx watch -r dotenv/config yblocker.ts",
     "build": "tsup",
     "start": "node dist/yblocker.js"
   },
   "dependencies": {
     "@cliqz/adblocker": "^1.26.6",
-    "dotenv": "^16.1.4",
+    "axios": "^1.4.0",
     "extract-domain": "^2.4.8",
     "mockttp": "^3.6.3",
     "picocolors": "^1.0.0",
     "psl": "^1.9.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.1.4",
     "esbuild-plugin-replace": "^1.4.0",
     "nodemon": "^2.0.22",
     "terser": "^5.17.7",

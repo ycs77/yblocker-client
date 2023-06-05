@@ -3,3 +3,4 @@ dist
 certs
 .env*
 !.env.example
+store.json
