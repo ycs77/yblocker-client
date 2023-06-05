@@ -37,13 +37,19 @@ if (fs.existsSync(path.resolve(__dirname, 'store.json'))) {
 
   const engine = await FiltersEngine.fromLists(fetch, config.filterLists)
 
-  if (fs.existsSync(path.resolve(__dirname, 'filter.txt'))) {
-    const list = fs.readFileSync(path.resolve(__dirname, 'filter.txt'), { encoding: 'utf-8' })
-    const { networkFilters, cosmeticFilters } = parseFilters(list)
+  function addFiltersFromText(text: string) {
+    const { networkFilters, cosmeticFilters } = parseFilters(text)
     engine.update({
       newNetworkFilters: networkFilters,
       newCosmeticFilters: cosmeticFilters,
     })
+  }
+
+  if (fs.existsSync(path.resolve(__dirname, 'filter.txt'))) {
+    const list = fs.readFileSync(path.resolve(__dirname, 'filter.txt'), {
+      encoding: 'utf-8',
+    })
+    addFiltersFromText(list)
   }
 
   const requests = new Map<string, CompletedRequest>()
