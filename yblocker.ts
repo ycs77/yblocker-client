@@ -13,8 +13,8 @@ const config = <Required<Config>>{
   filterLists: [],
   pollingStepTime: 60 * 10, // 10分鐘
   https: {
-    keyPath: './certs/testCA.key',
-    certPath: './certs/testCA.pem',
+    keyPath: path.resolve(__dirname, 'certs/testCA.key'),
+    certPath: path.resolve(__dirname, 'certs/testCA.pem'),
   },
   ...userConfig,
 }
