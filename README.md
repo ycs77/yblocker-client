@@ -16,5 +16,12 @@ openssl x509 -outform der -in certs/testCA.pem -out certs/testCA.crt
 Start proxy server:
 
 ```bash
-node yblocker.js
+yarn
+yarn dev
+```
+
+Build proxy server:
+
+```bash
+yarn build
 ```
