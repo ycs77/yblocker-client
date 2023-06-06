@@ -3,7 +3,7 @@ import path from 'path'
 import axios from 'axios'
 import * as mockttp from 'mockttp'
 import type { CompletedRequest } from 'mockttp'
-import { FiltersEngine, Request, parseFilters } from '@cliqz/adblocker'
+import { FiltersEngine, Request, NetworkFilter, CosmeticFilter, parseFilters } from '@cliqz/adblocker'
 import extractDomain from 'extract-domain'
 import c from 'picocolors'
 import userConfig from './config'
@@ -30,27 +30,17 @@ if (fs.existsSync(path.resolve(__dirname, 'store.json'))) {
   setStore(store)
 }
 
-(async () => {
+let networkFilters: NetworkFilter[] | null = null
+let cosmeticFilters: CosmeticFilter[] | null = null
+
+;(async () => {
   const server = mockttp.getLocal({
     https: config.https,
   })
 
   const engine = await FiltersEngine.fromLists(fetch, config.filterLists)
 
-  function addFiltersFromText(text: string) {
-    const { networkFilters, cosmeticFilters } = parseFilters(text)
-    engine.update({
-      newNetworkFilters: networkFilters,
-      newCosmeticFilters: cosmeticFilters,
-    })
-  }
-
-  if (fs.existsSync(path.resolve(__dirname, 'filter.txt'))) {
-    const list = fs.readFileSync(path.resolve(__dirname, 'filter.txt'), {
-      encoding: 'utf-8',
-    })
-    addFiltersFromText(list)
-  }
+  loadCustomFilter(engine)
 
   const requests = new Map<string, CompletedRequest>()
 
@@ -115,8 +105,23 @@ if (fs.existsSync(path.resolve(__dirname, 'store.json'))) {
 
   console.log(c.green(`Server running on port ${server.port}`))
 
-  pollingSendStoreData()
+  pollingSendStoreData(engine)
 })()
+
+function addFiltersFromText(engine: FiltersEngine, text: string) {
+  if (networkFilters !== null && cosmeticFilters !== null) {
+    engine.update({
+      removedNetworkFilters: networkFilters.map(filter => filter.getId()),
+      removedCosmeticFilters: cosmeticFilters.map(filter => filter.getId()),
+    })
+  }
+
+  const parsed = parseFilters(text)
+  engine.update({
+    newNetworkFilters: networkFilters = parsed.networkFilters,
+    newCosmeticFilters: cosmeticFilters = parsed.cosmeticFilters,
+  })
+}
 
 function getStore() {
   const store: Store = JSON.parse(
@@ -138,10 +143,30 @@ function setStore(store: Store) {
   })
 }
 
-function pollingSendStoreData() {
+function setCustomFilter(filter: string) {
+  fs.writeFileSync(path.resolve(__dirname, 'filter.txt'), filter, {
+    encoding: 'utf-8',
+  })
+}
+
+function loadCustomFilter(engine: FiltersEngine) {
+  if (!fs.existsSync(path.resolve(__dirname, 'filter.txt'))) {
+    setCustomFilter('')
+  }
+
+  const filter = fs.readFileSync(path.resolve(__dirname, 'filter.txt'), {
+    encoding: 'utf-8',
+  })
+  addFiltersFromText(engine, filter)
+}
+
+function pollingSendStoreData(engine: FiltersEngine) {
   const intervalTime = 1000 * config.pollingStepTime
 
-  setInterval(() => {
+  let i = 0
+  let max = 3
+
+  function startSendData() {
     store.pendingSendHistories = [
       ...store.pendingSendHistories,
       ...store.histories,
@@ -151,15 +176,15 @@ function pollingSendStoreData() {
 
     send()
 
-    let i = 0
-    let max = 3
+    i = 0
+
     function send() {
       let endpoint = process.env.YBLOCKER_SERVER_URL
       if (endpoint && /^https?:\/\/localhost/.test(endpoint)) {
         endpoint = endpoint.replace('localhost', '127.0.0.1')
       }
 
-      axios.post(`${endpoint}/api/histories`, {
+      axios.post(`${endpoint}/api/send`, {
         histories: store.pendingSendHistories,
       }, {
         headers: {
@@ -170,6 +195,10 @@ function pollingSendStoreData() {
       }).then(({ data }) => {
         store.pendingSendHistories = []
         setStore(store)
+
+        setCustomFilter(data.blacklist)
+        loadCustomFilter(engine)
+
         console.log(`${c.bgMagenta(' SEND  ')}\t${new Date().toLocaleString()}  |  ${data.message}`)
       }).catch(err => {
         i++
@@ -184,5 +213,8 @@ function pollingSendStoreData() {
         console.error('fetch error:', err.message)
       })
     }
-  }, intervalTime)
+  }
+
+  startSendData()
+  setInterval(startSendData, intervalTime)
 }

@@ -3,4 +3,5 @@ dist
 certs
 .env*
 !.env.example
+filter.txt
 store.json
