@@ -25,3 +25,9 @@ Build proxy server:
 ```bash
 yarn build
 ```
+
+Start the process from Powershell:
+
+```
+Powershell.exe -File C:\...\yblock.ps1
+```

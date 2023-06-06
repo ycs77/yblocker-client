@@ -44,6 +44,10 @@ export default defineConfig({
 
   async onSuccess() {
     fs.copyFileSync(
+      path.resolve(__dirname, 'yblock.ps1'),
+      path.resolve(__dirname, 'dist/yblock.ps1')
+    )
+    fs.copyFileSync(
       path.resolve(__dirname, 'node_modules/vm2/lib/bridge.js'),
       path.resolve(__dirname, 'dist/bridge.js')
     )
