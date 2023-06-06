@@ -3,6 +3,7 @@ import path from 'node:path'
 import { defineConfig } from 'tsup'
 import dotenv from 'dotenv'
 import { replace as EsbuildReplace } from 'esbuild-plugin-replace'
+import { codeBlock } from 'common-tags'
 
 function replaceEnvVars(envFilename: string) {
   const fullEnvFilename = path.resolve(__dirname, envFilename)
@@ -30,6 +31,16 @@ export default defineConfig({
   esbuildPlugins: [
     EsbuildReplace(replaceEnvVars('.env.production')),
   ],
+
+  banner: {
+    js: codeBlock`
+      /*!
+       * yBlocker Client
+       *
+       * (build ${new Date().toISOString().split('T')[0]})
+       */
+    `,
+  },
 
   async onSuccess() {
     fs.copyFileSync(
