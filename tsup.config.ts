@@ -27,7 +27,7 @@ export default defineConfig({
   entry: ['yblocker.ts'],
   minify: 'terser',
   clean: true,
-  noExternal: ['mockttp', '@cliqz/adblocker', 'extract-domain', 'picocolors'],
+  noExternal: ['axios', 'mockttp', '@cliqz/adblocker', 'extract-domain', 'picocolors'],
   esbuildPlugins: [
     EsbuildReplace(replaceEnvVars('.env.production')),
   ],
