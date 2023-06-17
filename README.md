@@ -29,5 +29,5 @@ yarn build
 用 Powershell 啟動：
 
 ```
-Powershell.exe -File C:\...\yblock.ps1
+Powershell.exe -File C:\...\yblocker.ps1
 ```
