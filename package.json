@@ -8,6 +8,7 @@
   "dependencies": {
     "@cliqz/adblocker": "^1.26.6",
     "axios": "^1.4.0",
+    "dayjs": "^1.11.8",
     "extract-domain": "^2.4.8",
     "mockttp": "^3.6.3",
     "picocolors": "^1.0.0",

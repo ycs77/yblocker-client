@@ -4,6 +4,7 @@ import { defineConfig } from 'tsup'
 import dotenv from 'dotenv'
 import { replace as EsbuildReplace } from 'esbuild-plugin-replace'
 import { codeBlock } from 'common-tags'
+import dayjs from 'dayjs'
 
 function replaceEnvVars(envFilename: string) {
   const fullEnvFilename = path.resolve(__dirname, envFilename)
@@ -27,7 +28,7 @@ export default defineConfig({
   entry: ['yblocker.ts'],
   minify: 'terser',
   clean: true,
-  noExternal: ['axios', 'mockttp', '@cliqz/adblocker', 'extract-domain', 'psl', 'picocolors'],
+  noExternal: ['axios', 'mockttp', '@cliqz/adblocker', 'extract-domain', 'psl', 'picocolors', 'dayjs'],
   esbuildPlugins: [
     EsbuildReplace(replaceEnvVars('.env.production')),
   ],
@@ -37,7 +38,7 @@ export default defineConfig({
       /*!
        * yBlocker Client
        *
-       * (build ${new Date().toISOString().split('T')[0]})
+       * (build ${dayjs().format('YYYY-MM-DD')})
        */
     `,
   },

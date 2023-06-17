@@ -6,6 +6,7 @@ import type { CompletedRequest } from 'mockttp'
 import { FiltersEngine, Request, NetworkFilter, CosmeticFilter, parseFilters } from '@cliqz/adblocker'
 import extractDomain from 'extract-domain'
 import c from 'picocolors'
+import dayjs from 'dayjs'
 import userConfig from './config'
 import { Store, Config } from './utils'
 
@@ -85,7 +86,7 @@ let cosmeticFilters: CosmeticFilter[] | null = null
           store.histories.push({
             url: req.url.slice(0, 255),
             hostname: hostname.slice(0, 255),
-            created_at: new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, ''),
+            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           })
           setStore(store)
 
