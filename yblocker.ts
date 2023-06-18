@@ -77,6 +77,8 @@ let cosmeticFilters: CosmeticFilter[] | null = null
           if (!body) return
           if (!(/(<!DOCTYPE html>|<html ?>?)/i.test(body))) return
 
+          const title = body.match(/<title>(.*)<\/title>/)?.[1] ?? ''
+
           const { styles, scripts } = engine.getCosmeticsFilters({
             url: req.url,
             hostname: hostname,
@@ -86,6 +88,7 @@ let cosmeticFilters: CosmeticFilter[] | null = null
           store.histories.push({
             url: req.url.slice(0, 255),
             hostname: hostname.slice(0, 255),
+            title: title.slice(0, 255),
             created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           })
           setStore(store)

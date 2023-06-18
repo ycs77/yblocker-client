@@ -1,6 +1,7 @@
 export interface History {
   url: string
   hostname: string
+  title: string
   created_at: string
 }
 
